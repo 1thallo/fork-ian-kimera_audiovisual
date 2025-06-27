@@ -2,7 +2,6 @@ const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 require('dotenv').config();
 
-// Importa as rotas
 const usuariosRouter = require('./routes/users');
 const postsRouter = require('./routes/posts');
 const interacoesRouter = require('./routes/interactions');
@@ -10,7 +9,6 @@ const interacoesRouter = require('./routes/interactions');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configura o Swagger
 const swaggerDocument = {
     openapi: '3.0.0',
     info: {

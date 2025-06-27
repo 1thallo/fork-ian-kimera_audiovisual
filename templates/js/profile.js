@@ -77,13 +77,8 @@ function renderUserProfile(user) {
     const logoutButton = document.getElementById('profile-logout-button');
     if (logoutButton) {
         logoutButton.addEventListener('click', () => {
-            // Limpa o token e qualquer outra informação do usuário do localStorage
             localStorage.clear();
-            // Redireciona para a página de login
             window.location.href = 'index.html';
         });
     }
 }
-
-// Futuramente, você pode criar esta função para buscar os posts
-// async function fetchAndRenderPosts(userId) { ... }

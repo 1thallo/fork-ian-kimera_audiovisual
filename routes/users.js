@@ -5,10 +5,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const auth = require('./auth');
 
-// Configura o JWT
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// POST /api/usuarios/ (Criar um novo usuário - Cadastro)
 router.post('/', async (req, res) => {
     const { nome_completo, nome_usuario, email, senha, id_foto_perfil = 1 } = req.body;
 
@@ -17,13 +15,12 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        const senha_hash = await bcrypt.hash(senha, 10); // Gera o hash da senha
+        const senha_hash = await bcrypt.hash(senha, 10);
         const sql = 'INSERT INTO Usuarios (nome_completo, nome_usuario, email, senha_hash, id_foto_perfil) VALUES (?, ?, ?, ?, ?)';
         const [result] = await db.query(sql, [nome_completo, nome_usuario, email, senha_hash, id_foto_perfil]);
         
         res.status(201).json({ message: 'Usuário criado com sucesso!', userId: result.insertId });
     } catch (error) {
-        // Trata erro de e-mail/usuário duplicado
         if (error.code === 'ER_DUP_ENTRY') {
             return res.status(409).json({ error: 'Nome de usuário ou e-mail já existem.' });
         }
@@ -55,7 +52,6 @@ router.post('/login', async (req, res) => {
                 email: user.email
             };
 
-            // Gera o token JWT
             const token = jwt.sign(
                 payload,    
                 JWT_SECRET,   
@@ -79,7 +75,6 @@ router.post('/login', async (req, res) => {
 router.get('/me', auth, async (req, res) => {
     try {
         const userId = req.user.userId;
-        // --- QUERY ATUALIZADA ---
         const sql = `
             SELECT 
                 u.id_usuario, u.nome_completo, u.nome_usuario, u.biografia, u.data_criacao, p.url_foto,
@@ -101,15 +96,12 @@ router.get('/me', auth, async (req, res) => {
     }
 });
 
-router.put('/editar', auth, async (req, res) => { // <-- 2. Usa o middleware aqui
+router.put('/editar', auth, async (req, res) => {
     
-    // 3. O ID do usuário vem do token, garantindo que ele só possa editar o próprio perfil.
     const userId = req.user.userId; 
 
-    // 4. Pega os dados que o usuário quer atualizar do corpo da requisição.
     const { nome_completo, nome_usuario, biografia, id_foto_perfil } = req.body;
 
-    // 5. Monta a query de forma dinâmica para atualizar apenas os campos fornecidos.
     const fields = [];
     const values = [];
 
@@ -130,12 +122,10 @@ router.put('/editar', auth, async (req, res) => { // <-- 2. Usa o middleware aqu
         values.push(id_foto_perfil);
     }
 
-    // Se nenhum campo foi enviado, retorna um erro.
     if (fields.length === 0) {
         return res.status(400).json({ error: 'Nenhum campo fornecido para atualização.' });
     }
 
-    // Adiciona o ID do usuário ao final do array de valores para a cláusula WHERE.
     values.push(userId);
 
     const sql = `UPDATE Usuarios SET ${fields.join(', ')} WHERE id_usuario = ?`;
@@ -150,7 +140,6 @@ router.put('/editar', auth, async (req, res) => { // <-- 2. Usa o middleware aqu
         res.status(200).json({ message: 'Perfil atualizado com sucesso!' });
 
     } catch (error) {
-        // Trata erro de nome de usuário duplicado
         if (error.code === 'ER_DUP_ENTRY') {
             return res.status(409).json({ error: 'O nome de usuário já está em uso.' });
         }
@@ -163,7 +152,6 @@ router.get('/:nome_usuario', auth, async (req, res) => {
     const loggedUserId = req.user.userId;
     
     try {
-        // --- QUERY ATUALIZADA ---
         const sql = `
             SELECT 
                 u.id_usuario, u.nome_completo, u.nome_usuario, u.biografia, u.data_criacao, p.url_foto,

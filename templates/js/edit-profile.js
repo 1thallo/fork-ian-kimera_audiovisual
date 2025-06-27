@@ -1,12 +1,10 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // --- VERIFICAÇÃO DE LOGIN ---
     const token = localStorage.getItem('token');
     if (!token) {
         window.location.href = 'login.html';
         return;
     }
 
-    // --- SELETORES DE ELEMENTOS DO FORMULÁRIO ---
     const form = document.getElementById('edit-profile-form');
     const messageDiv = document.getElementById('form-message');
     const nomeCompletoInput = document.getElementById('nome_completo');
@@ -14,7 +12,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const biografiaInput = document.getElementById('biografia');
     const fotoIdInput = document.getElementById('id_foto_perfil');
 
-    // --- 1. BUSCAR E PREENCHER DADOS ATUAIS ---
     try {
         messageDiv.innerHTML = '<div class="text-center"><div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Loading...</span></div> Carregando seus dados...</div>';
 
@@ -28,13 +25,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const user = await response.json();
 
-        // Preenche o formulário com os dados recebidos da API
         nomeCompletoInput.value = user.nome_completo || '';
         nomeUsuarioInput.value = user.nome_usuario || '';
         biografiaInput.value = user.biografia || '';
         fotoIdInput.value = user.id_foto_perfil || 1;
         
-        messageDiv.innerHTML = ''; // Limpa a mensagem de "carregando"
+        messageDiv.innerHTML = '';
 
     } catch (error) {
         console.error("Erro ao carregar perfil:", error);
@@ -42,12 +38,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
 
-    // --- 2. LIDAR COM O ENVIO DO FORMULÁRIO ---
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
-        messageDiv.innerHTML = ''; // Limpa mensagens antigas
+        messageDiv.innerHTML = '';
 
-        // Coleta os dados atualizados do formulário
         const updatedData = {
             nome_completo: nomeCompletoInput.value,
             nome_usuario: nomeUsuarioInput.value,
@@ -69,12 +63,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (response.ok) {
                 messageDiv.innerHTML = '<div class="alert alert-success">Perfil atualizado com sucesso! Redirecionando...</div>';
-                // Redireciona para a página de perfil após 2 segundos para ver as mudanças
                 setTimeout(() => {
                     window.location.href = 'profile.html';
                 }, 2000);
             } else {
-                // Exibe o erro específico da API (ex: "nome de usuário já em uso")
                 messageDiv.innerHTML = `<div class="alert alert-danger">${result.error || 'Ocorreu um erro ao atualizar.'}</div>`;
             }
 

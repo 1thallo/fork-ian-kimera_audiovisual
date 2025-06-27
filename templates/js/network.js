@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- AUTENTICAÇÃO E INICIALIZAÇÃO ---
     const token = localStorage.getItem('token');
     const loggedInUserId = localStorage.getItem('userId');
 
@@ -12,8 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const createPostForm = document.getElementById('create-post-form');
     const postTextarea = document.getElementById('post-textarea');
     const userAvatarPostbox = document.getElementById('user-avatar-postbox');
-
-    // --- FUNÇÕES ---
 
     async function fetchAndRenderFeed() {
         feedContainer.innerHTML = '<div class="text-center p-5"><div class="spinner-border" role="status"></div></div>';
@@ -132,7 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // --- FUNÇÃO DE INTERAÇÃO COMPLETA ---
     async function handleFeedInteraction(event) {
         const target = event.target.closest('[data-action]');
         if (!target) return;
@@ -181,7 +177,6 @@ document.addEventListener('DOMContentLoaded', () => {
             throw new Error(errorData.error || 'Falha ao deletar.');
         }
         
-        // Reload da página após deletar
         location.reload();
     }
 
@@ -197,14 +192,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const icon = button.querySelector('i');
         const countSpan = button.querySelector('[data-role="like-count"]');
         
-        // Atualiza o ícone
         if (data.curtiu) {
             icon.className = 'bi bi-heart-fill text-danger';
         } else {
             icon.className = 'bi bi-heart';
         }
         
-        // Atualiza a contagem
         countSpan.textContent = data.likes_count;
     }
 
@@ -212,11 +205,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const commentsSection = document.getElementById(`comments-${postId}`);
         
         if (commentsSection.style.display === 'none') {
-            // Mostrar comentários
             commentsSection.style.display = 'block';
             await loadComments(postId);
         } else {
-            // Esconder comentários
             commentsSection.style.display = 'none';
         }
     }
@@ -281,11 +272,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = await response.json();
         input.value = '';
         
-        // Atualiza contador de comentários
         const countSpan = document.querySelector(`[data-post-id="${postId}"][data-action="toggle-comments"] [data-role="comment-count"]`);
         countSpan.textContent = data.comments_count;
         
-        // Recarrega os comentários
         await loadComments(postId);
     }
 
@@ -299,7 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const data = await response.json();
         
-        // Atualiza TODOS os botões de seguir/desseguir dessa pessoa no feed
         const allFollowButtons = document.querySelectorAll(`[data-action="toggle-follow"][data-user-id="${userId}"]`);
         
         allFollowButtons.forEach(btn => {
@@ -323,16 +311,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!response.ok) throw new Error('Falha ao deletar comentário');
         
-        // Recarrega os comentários
         await loadComments(postId);
         
-        // Atualiza contador (decrementa)
         const countSpan = document.querySelector(`[data-post-id="${postId}"][data-action="toggle-comments"] [data-role="comment-count"]`);
         const currentCount = parseInt(countSpan.textContent);
         countSpan.textContent = Math.max(0, currentCount - 1);
     }
 
-    // --- EVENT LISTENERS E INICIALIZAÇÃO ---
     createPostForm.addEventListener('submit', handlePostSubmit);
     feedContainer.addEventListener('click', handleFeedInteraction);
     
